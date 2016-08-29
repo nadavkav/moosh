@@ -19,12 +19,14 @@ class PluginList extends MooshCommand
         parent::__construct('list', 'plugin');
 
         $this->addOption('p|path:', 'path to plugins.json file', home_dir() . '/.moosh/plugins.json');
+        $this->addOption('l|latest', 'Display latest stable version + git repo');
     }
 
     public function execute()
     {
 
         $filepath = $this->expandedOptions['path'];
+        $latest = $this->expandedOptions['latest'];
 
         $stat = NULL;
         if(file_exists($filepath)) {
@@ -57,6 +59,8 @@ class PluginList extends MooshCommand
                 }
                 $fulllist[$plugin->component]['url'] = $version->downloadurl;
             }
+            $fulllist[$plugin->component]['git'] = $plugin->source;
+
         }
 
         ksort($fulllist);
@@ -64,7 +68,13 @@ class PluginList extends MooshCommand
             $versions = array_keys($plugin['releases']);
             sort($versions);
 
-            echo "$k," .implode(",",$versions) . ",".$plugin['url'] ."\n";
+            if ($latest) {
+                //$ver = (isset($versions[1])) ? $versions[1] : '';
+                $ver = array_pop($versions);
+                echo "$k," . $ver . ",".$plugin['git'] ."\n";
+            } else {
+                echo "$k," .implode(",",$versions) . ",".$plugin['url'] ."\n";
+            }
         }
     }
 
