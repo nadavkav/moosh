@@ -48,6 +48,25 @@ class PluginInstall extends MooshCommand
 
         $this->init();
 
+        // Edit the four values below
+        $PROXY_HOST = "bcproxy.weizmann.ac.il"; // Proxy server address
+        $PROXY_PORT = "8080";    // Proxy server port
+        //$PROXY_USER = "LOGIN";    // Username
+        //$PROXY_PASS = "PASSWORD";   // Password
+        // Username and Password are required only if your proxy server needs basic authentication
+
+        //$auth = base64_encode("$PROXY_USER:$PROXY_PASS");
+        stream_context_set_default(
+            array(
+                'http' => array(
+                'proxy' => "tcp://$PROXY_HOST:$PROXY_PORT",
+                'request_fulluri' => true,
+                //'header' => "Proxy-Authorization: Basic $auth"
+                // Remove the 'header' option if proxy authentication is not required
+                )
+            )
+        );
+        
         $pluginname     = $this->arguments[0];
         $pluginversion  = $this->arguments[1];
 
@@ -142,6 +161,10 @@ class PluginInstall extends MooshCommand
                 continue;
             }
             if ($plugin->component == $pluginname) {
+                if ($pluginversion === 'latest') {
+                    $latest = array_pop($plugin->versions);
+                    return $latest->downloadurl;
+                }
                 $bestversion = false;
                 $altversion = false;
                 foreach ($plugin->versions as $version) {
@@ -153,6 +176,7 @@ class PluginInstall extends MooshCommand
                         }
                     }
                 }
+                
                 if (!$this->expandedOptions['force'] && !$bestversion) {
                     $message =
                             "This plugin is not supported for your Moodle version (release $this->moodlerelease - version $this->moodleversion). ";
@@ -183,6 +207,26 @@ class PluginInstall extends MooshCommand
 
     private function get_plugins_data()
     {
+    
+        // Edit the four values below
+        $PROXY_HOST = "bcproxy.weizmann.ac.il"; // Proxy server address
+        $PROXY_PORT = "8080";    // Proxy server port
+        //$PROXY_USER = "LOGIN";    // Username
+        //$PROXY_PASS = "PASSWORD";   // Password
+        // Username and Password are required only if your proxy server needs basic authentication
+
+        //$auth = base64_encode("$PROXY_USER:$PROXY_PASS");
+        stream_context_set_default(
+            array(
+                'http' => array(
+                'proxy' => "tcp://$PROXY_HOST:$PROXY_PORT",
+                'request_fulluri' => true,
+                //'header' => "Proxy-Authorization: Basic $auth"
+                // Remove the 'header' option if proxy authentication is not required
+                )
+            )
+        );
+        
         $pluginsfile = home_dir() . '/.moosh/plugins.json';
 
         $stat = @stat($pluginsfile);
