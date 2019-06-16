@@ -25,6 +25,25 @@ class PluginList extends MooshCommand
     public function execute()
     {
 
+        // Edit the four values below
+        $PROXY_HOST = "bcproxy.weizmann.ac.il"; // Proxy server address
+        $PROXY_PORT = "8080";    // Proxy server port
+        //$PROXY_USER = "LOGIN";    // Username
+        //$PROXY_PASS = "PASSWORD";   // Password
+        // Username and Password are required only if your proxy server needs basic authentication
+
+        //$auth = base64_encode("$PROXY_USER:$PROXY_PASS");
+        stream_context_set_default(
+            array(
+                'http' => array(
+                'proxy' => "tcp://$PROXY_HOST:$PROXY_PORT",
+                'request_fulluri' => true,
+                //'header' => "Proxy-Authorization: Basic $auth"
+                // Remove the 'header' option if proxy authentication is not required
+                )
+            )
+        );
+
         $filepath = $this->expandedOptions['path'];
 
         $stat = NULL;
